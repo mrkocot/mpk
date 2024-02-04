@@ -12,9 +12,9 @@ export class DbService {
   // TODO - create concrete implementation
   async getCities(): Promise<City[]> {
     let mock = [
-      new City("krakow", "PL", "Kraków"),
-      new City("frankfurt-ab-main", "DE", "Frankfurt"),
-      new City("tokyo", "JP", "Tokyo"),
+      new City("krakow", "PL", "Kraków", "albert@mpk.pl"),
+      new City("frankfurt-ab-main", "DE", "Frankfurt", "admin@frgh.de"),
+      new City("tokyo", "JP", "Tokyo", "blob@glon.jp"),
     ];
     return mock;
   }
