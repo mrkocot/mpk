@@ -1,0 +1,47 @@
+.city-list {
+    float: left;
+    width: 30%;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .city-details {
+    float: left;
+    width: 70%;
+    padding: 20px;
+  }
+  
+  .city-list h2,
+  .city-details h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  li {
+    margin: 5px 0;
+  }
+  
+  a {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  textarea {
+    width: 100%;
+    height: 150px;
+  }
+  
+  button {
+    margin-top: 10px;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 20px;
+  }
+  

@@ -1,0 +1,35 @@
+<div class="city-list">
+    <h2>Lista Miast</h2>
+    <ul>
+      <li *ngFor="let city of cities$ | async">
+        <a (click)="selectCity(city.id)">{{ city.name }}</a>
+      </li>
+    </ul>
+  </div>
+  
+<div class="city-details">
+    <h2>Szczegóły Miasta</h2>
+    <div *ngIf="(selectedCity$ | async) as selectedCity; else noCitySelected">
+      <h3>{{ selectedCity.name }}</h3>
+      <p>Kraj: {{ selectedCity.country }}</p>
+      <p>Edytor: {{ selectedCity.editor }}</p>
+      <textarea
+        *ngIf="selectedCity.editor === (user$ | async)?.email"
+        [(ngModel)]="editForm.value.content"
+      ></textarea>
+      <button
+        *ngIf="selectedCity.editor === (user$ | async)?.email"
+        (click)="updateContent(selectedCity)"
+      >
+        Zapisz
+      </button>
+    </div>
+    <ng-template #noCitySelected>
+      <p>Wybierz miasto, aby zobaczyć szczegóły.</p>
+    </ng-template>
+  </div>
+  <!-- ... -->
+  
+  
+  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+  
