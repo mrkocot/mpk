@@ -1,3 +1,16 @@
-<div style="border: 2px black solid;">
-    <p>Login placeholder</p>
-</div>
+<div class="page-background">
+    <div class="menu-container">
+        <!-- <button type="button" 
+            class="menu-item btn btn-outline-dark"
+            (click)="authService.GoogleAuth()">
+            Log In Via Google
+        </button> -->
+        <div class="button-container">
+            <button class="login-button"
+            (click)="loginService.GoogleAuth()">
+            Log in via Google</button>
+            <button class="login-button"
+            (click)="loginService.logout()">
+            Log out</button>
+        </div>
+    </div>
