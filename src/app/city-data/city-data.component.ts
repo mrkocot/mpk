@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, collectionData, doc, docData, updateDoc } from '@angular/fire/firestore';
-import { Auth, user } from '@angular/fire/auth';
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, of, from } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { City } from '../city';
+import { DbService } from '../db.service';
+import { AuthenticationService } from '../authentication.service';
 
 @Component({
   selector: 'app-city-data',
@@ -14,89 +15,96 @@ import { City } from '../city';
 export class CityDataComponent implements OnInit {
   cities$: Observable<City[]> = of([]);
   selectedCity$: Observable<City | undefined> = of(undefined);
+  selectedCityData$: Observable<any[]> = of([]);
   editForm: FormGroup;
-  user$: Observable<any>;
+  currentUsername: string | null = null;
   errorMessage: string = '';
 
   constructor(
-    private firestore: Firestore,
-    private auth: Auth,
-    private fb: FormBuilder
+    private dbService: DbService,
+    private fb: FormBuilder,
+    private authService: AuthenticationService,
+    private router: Router
   ) {
     this.editForm = this.fb.group({
       content: ['']
     });
-    this.user$ = user(auth);
   }
 
   ngOnInit(): void {
-    const citiesCollection = collection(this.firestore, 'cities');
-    this.cities$ = collectionData(citiesCollection, { idField: 'id' })
-      .pipe(
-        map((data: any[]) => {
-          // Mapowanie danych z Firestore na obiekty City
-          return data.map(item => ({
-            id: item.id,
-            name: item.name,
-            country: item.country,
-            editor: item.editor
-          }));
-        }),
-        catchError(error => {
-          console.error('Error loading cities:', error);
-          this.errorMessage = 'Wystąpił błąd podczas ładowania miast.';
-          return of([]);
-        })
-      ) as Observable<City[]>;
+    this.loadCities();
+    this.subscribeToUser();
+
   }
 
-  selectCity(cityId: string) {
-    const cityDocRef = doc(this.firestore, `cities/${cityId}`);
-    this.selectedCity$ = docData(cityDocRef, { idField: 'id' })
-      .pipe(
-        map((data: any) => {
-          if (!data) {
-            return undefined; // Jeśli dane są undefined, zwróć undefined
-          }
-
-          // Przekształć dane z Firestore na obiekt City
-          return {
-            id: data.id,
-            name: data.name,
-            country: data.country,
-            editor: data.editor
-          };
-        }),
-        catchError(error => {
-          console.error('Error loading city details:', error);
-          this.errorMessage = 'Wystąpił błąd podczas ładowania szczegółów miasta.';
-          return of(undefined);
-        })
-      ) as Observable<City | undefined>;
+  subscribeToUser(): void {
+    this.authService.currentUser$.subscribe(username => {
+      this.currentUsername = username;
+      if (!username) {
+        this.router.navigate(['/login']); // Przekierowanie do logowania, jeśli nie ma użytkownika
+      }
+    });
   }
 
-  async updateContent(city: City) {
-    if (!city.id) return;
-    const cityDocRef = doc(this.firestore, `cities/${city.id}`);
-    this.user$.pipe(
-      switchMap(async (currentUser) => {
-        if (currentUser && currentUser.email === city.editor) {
-          try {
-            await updateDoc(cityDocRef, {
-              content: this.editForm.value.content
-            });
-            console.log('Content updated successfully');
-          } catch (error) {
-            console.error('Error updating content:', error);
-            this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
-          }
-        }
-      }),
+  loadCities(): void {
+    this.cities$ = from(this.dbService.getCities()).pipe(
       catchError(error => {
-        console.error('Error updating content:', error);
-        this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
-        return of(undefined);
+        this.errorMessage = 'Wystąpił błąd podczas ładowania miast.';
+        return of([]);
       })
-    ).subscribe();
+    );
+  }
+
+  selectCity(cityId: string): void {
+    this.selectedCity$ = this.cities$.pipe(
+      map(cities => cities.find(city => city.id === cityId))
+    );
+    
+    this.selectedCityData$ = from(this.dbService.getData(cityId)).pipe(
+      catchError(error => {
+        this.errorMessage = 'Wystąpił błąd podczas ładowania danych miasta.';
+        return of([]);
+      })
+    );
+  }
+
+  updateContent(paragraphId: string, newContent: string): void {
+    this.selectedCity$.subscribe(city => {
+      if (!city) {
+        this.errorMessage = 'Nie wybrano miasta.';
+        return;
+      }
+  
+      if (this.currentUsername && city.editor === this.currentUsername) {
+        this.dbService.updateParagraph(city.id, paragraphId, newContent)
+          .then(() => {
+            console.log('Treść zaktualizowana pomyślnie');
+            // Zaktualizuj lokalne dane paragrafu
+            this.selectedCityData$ = this.selectedCityData$.pipe(
+              map(paragraphs => {
+                const index = paragraphs.findIndex(p => p.id === paragraphId);
+                if (index !== -1) {
+                  paragraphs[index].body = newContent;
+                }
+                return paragraphs;
+              })
+            );
+          })
+          .catch(error => {
+            console.error('Błąd podczas aktualizacji treści:', error);
+            this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
+          });
+      } else {
+        this.errorMessage = 'Nie masz uprawnień do edycji tej treści.';
+      }
+    });
+  }
+  
+  
+  
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']); // Przekierowanie do logowania
   }
 }

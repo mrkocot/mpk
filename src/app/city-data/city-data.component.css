@@ -1,47 +1,117 @@
-.city-list {
-    float: left;
-    width: 30%;
-    padding: 20px;
-    border-right: 1px solid #ccc;
-  }
-  
-  .city-details {
-    float: left;
-    width: 70%;
-    padding: 20px;
-  }
-  
-  .city-list h2,
-  .city-details h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    margin: 5px 0;
-  }
-  
-  a {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  
-  textarea {
-    width: 100%;
-    height: 150px;
-  }
-  
-  button {
-    margin-top: 10px;
-  }
-  
-  .error-message {
-    color: red;
-    margin-top: 20px;
-  }
-  
+/* city-data.component.css */
+
+/* Reset some default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Style for the container */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #333;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+li {
+  text-align: center; 
+}
+
+.logout-btn, button {
+  cursor: pointer;
+  padding: 10px 20px;
+  margin-top: 10px;
+  border: none;
+  color: rgb(45, 46, 9);
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  outline: none;
+  text-transform: uppercase;
+}
+
+button:hover, .login-btn:hover, .logout-btn:hover {
+  background-color: #f8d088;
+}
+
+/* Style for the list of cities */
+.cities-list ul {
+  list-style-type: none;
+}
+
+.cities-list li {
+  padding: 10px;
+  background-color: #f0f0f0;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  color: #333;
+  transition: transform 0.2s ease;
+}
+
+.cities-list li:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.05);
+}
+
+/* Style for the city details */
+.city-details {
+  margin-top: 20px;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 5px;
+  width: 100%;
+  background: #444;
+}
+
+/* Style for paragraphs in city details */
+.city-details p {
+  margin: 10px 0;
+}
+
+/* Style for form elements */
+form {
+  margin-top: 20px;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background: #555;
+  color: #fff;
+}
+
+/* Error message styling */
+.error {
+  color: #ff0000;
+  margin-top: 20px;
+}
+
+/* Header styling */
+.header {
+  width: 100%;
+  padding: 10px 0;
+  text-align: center;
+  background: #222;
+  margin-bottom: 20px;
+}
+
+/* Welcome message styling */
+.header h1 {
+  color: #f8d088;
+}

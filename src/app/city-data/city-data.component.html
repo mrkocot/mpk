@@ -1,35 +1,35 @@
-<div class="city-list">
-    <h2>Lista Miast</h2>
+<div class="container">
+  <div class="header">
+    <button class="logout-btn" (click)="logout()">Wyloguj</button>
+    <h1>Witaj, {{ currentUsername }}</h1>
+  </div>
+
+  <div class="cities-list">
+    <h2>Lista miast: </h2>
+    <br>
     <ul>
-      <li *ngFor="let city of cities$ | async">
-        <a (click)="selectCity(city.id)">{{ city.name }}</a>
+      <li *ngFor="let city of cities$ | async" (click)="selectCity(city.id)">
+        {{ city.name }}
       </li>
     </ul>
   </div>
-  
-<div class="city-details">
-    <h2>Szczegóły Miasta</h2>
-    <div *ngIf="(selectedCity$ | async) as selectedCity; else noCitySelected">
-      <h3>{{ selectedCity.name }}</h3>
-      <p>Kraj: {{ selectedCity.country }}</p>
-      <p>Edytor: {{ selectedCity.editor }}</p>
-      <textarea
-        *ngIf="selectedCity.editor === (user$ | async)?.email"
-        [(ngModel)]="editForm.value.content"
-      ></textarea>
-      <button
-        *ngIf="selectedCity.editor === (user$ | async)?.email"
-        (click)="updateContent(selectedCity)"
-      >
-        Zapisz
-      </button>
+
+  <div *ngIf="selectedCity$ | async as selectedCity" class="city-details">
+    <h3>Szczegóły miasta: {{ selectedCity.name }}</h3>
+    <div *ngFor="let paragraph of selectedCityData$ | async">
+      <p><strong>Nagłówek:</strong> {{ paragraph.header }}</p>
+      <p><strong>Treść:</strong> {{ paragraph.body }}</p>
+      <div *ngIf="currentUsername === selectedCity.editor">
+        <form [formGroup]="editForm">
+          <label for="content">Edytuj treść:</label>
+          <textarea id="content" formControlName="content"></textarea>
+          <button type="button" (click)="updateContent(paragraph.id, editForm.value.content)">Zapisz zmiany</button>
+        </form>
+      </div>
     </div>
-    <ng-template #noCitySelected>
-      <p>Wybierz miasto, aby zobaczyć szczegóły.</p>
-    </ng-template>
   </div>
-  <!-- ... -->
-  
-  
-  <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
-  
+
+  <div *ngIf="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
+</div>
