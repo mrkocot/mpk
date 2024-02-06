@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthenticationService } from '../authentication.service';
+import { LoginService } from '../login.service'; // Updated import
 import { Router } from '@angular/router';
-import { ElementRef } from '@angular/core';
-
-
 
 @Component({
   selector: 'app-login',
@@ -11,32 +8,27 @@ import { ElementRef } from '@angular/core';
   <div *ngIf="!loggedIn" class="login-container">
     <img src="assets/bus.png" alt="Bus Image" class="bus-image">
     <div *ngIf="!loggedIn" class="login-form">
-      <input type="text" placeholder="Nazwa Użytkownika" [(ngModel)]="username" (keyup.enter)="login()">
-      <button class="login-btn" (click)="login()">Zaloguj</button>
+      <button class="login-btn" (click)="login()">Zaloguj z Google</button>
     </div>
   </div>`,
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  username: string = '';
-  loggedIn: boolean = false; 
+  loggedIn: boolean = false;
 
   constructor(
-    private authService: AuthenticationService,
+    private loginService: LoginService, // Updated to use LoginService
     private router: Router
   ) { }
 
   login() {
-    if (this.username.trim() === '') {
-      // Handle the case when the username is empty
-      console.log('Username is empty. Please enter a username.');
-    } else {
-      // Non-empty username, proceed with login and remove the login container
-      this.authService.login(this.username);
-      this.loggedIn = true; // Set the loggedIn flag to true
-  
-      // Navigate to CityDataComponent
+    // Initiates Google Authentication
+    this.loginService.GoogleAuth().then(() => {
+      this.loggedIn = true; // Update loggedIn status based on auth state
+      // Navigate to CityDataComponent or other component as necessary
       this.router.navigate(['/city-data']);
-    }
+    }).catch((error) => {
+      console.error('Login failed:', error);
+    });
   }
 }

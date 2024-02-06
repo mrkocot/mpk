@@ -42,7 +42,7 @@
   /* Style for the login button */
   .login-btn {
     background-color: #f8d088;
-    color: white;
+    color: rgb(0, 0, 0);
     padding: 10px 20px;
     border: none;
     cursor: pointer;

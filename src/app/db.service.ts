@@ -15,6 +15,12 @@ export class DbService {
       new City("krakow", "PL", "Kraków", "albert@mpk.pl"),
       new City("frankfurt-ab-main", "DE", "Frankfurt", "admin@frgh.de"),
       new City("tokyo", "JP", "Tokyo", "blob@glon.jp"),
+      new City("new-york", "US", "New York", "nyadmin@nyc.gov"),
+      new City("paris", "FR", "Paris", "parisadmin@paris.fr"),
+      new City("london", "GB", "London", "londonadmin@london.uk"),
+      new City("sydney", "AU", "Sydney", "sydneyadmin@sydney.au"),
+      new City("berlin", "DE", "Berlin", "berlinadmin@berlin.de"),
+      new City("rome", "IT", "Rome", "romeadmin@rome.it")
     ];
     return mock;
   }

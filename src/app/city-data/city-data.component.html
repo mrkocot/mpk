@@ -1,12 +1,14 @@
 <div class="container">
   <div class="header">
-    <button class="logout-btn" (click)="logout()">Wyloguj</button>
-    <h1>Witaj, {{ currentUsername }}</h1>
+    <div class="user-info">
+      <h1>Witaj, {{ userName }}</h1>
+      <img *ngIf="userProfilePic" [src]="userProfilePic" alt="Profile Picture" class="user-profile-pic">
+      <button class="logout-btn" (click)="logout()">Wyloguj</button>
+    </div>
   </div>
-
+  <h2>Lista miast: </h2>
+  <br>
   <div class="cities-list">
-    <h2>Lista miast: </h2>
-    <br>
     <ul>
       <li *ngFor="let city of cities$ | async" (click)="selectCity(city.id)">
         {{ city.name }}
@@ -15,11 +17,11 @@
   </div>
 
   <div *ngIf="selectedCity$ | async as selectedCity" class="city-details">
-    <h3>Szczegóły miasta: {{ selectedCity.name }}</h3>
+    <h3>Szczegóły miasta: {{ selectedCity.country }}</h3>
     <div *ngFor="let paragraph of selectedCityData$ | async">
       <p><strong>Nagłówek:</strong> {{ paragraph.header }}</p>
       <p><strong>Treść:</strong> {{ paragraph.body }}</p>
-      <div *ngIf="currentUsername === selectedCity.editor">
+      <div *ngIf="userEmail === selectedCity.editor"> <!-- Updated to use userEmail -->
         <form [formGroup]="editForm">
           <label for="content">Edytuj treść:</label>
           <textarea id="content" formControlName="content"></textarea>
