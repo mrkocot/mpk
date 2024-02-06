@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from '../authentication.service';
 import { Router } from '@angular/router';
+import { ElementRef } from '@angular/core';
+
 
 
 @Component({
@@ -9,7 +11,7 @@ import { Router } from '@angular/router';
   <div *ngIf="!loggedIn" class="login-container">
     <img src="assets/bus.png" alt="Bus Image" class="bus-image">
     <div *ngIf="!loggedIn" class="login-form">
-      <input type="text" placeholder="Nazwa Użytkownika" [(ngModel)]="username">
+      <input type="text" placeholder="Nazwa Użytkownika" [(ngModel)]="username" (keyup.enter)="login()">
       <button class="login-btn" (click)="login()">Zaloguj</button>
     </div>
   </div>`,
