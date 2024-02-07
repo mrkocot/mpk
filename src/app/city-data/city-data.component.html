@@ -6,7 +6,7 @@
       <button class="logout-btn" (click)="logout()">Wyloguj</button>
     </div>
   </div>
-  <h2>Lista krajów: </h2>
+  <h2>Lista miast: </h2>
   <br>
   <div class="cities-list">
     <ul>
@@ -17,7 +17,7 @@
   </div>
 
   <div *ngIf="selectedCity$ | async as selectedCity" class="city-details">
-    <h3>Szczegóły miasta: {{ selectedCity.country }}</h3>
+    <h3>Szczegóły miasta: {{ selectedCity.name }}</h3>
     <div *ngFor="let paragraph of selectedCityData$ | async">
       <p><strong>Nagłówek:</strong> {{ paragraph.header }}</p>
       <p><strong>Treść:</strong> {{ paragraph.body }}</p>
