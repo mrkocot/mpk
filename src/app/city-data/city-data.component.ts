@@ -79,9 +79,35 @@ export class CityDataComponent implements OnInit {
   }
 
   updateContent(paragraphId: string, newContent: string): void {
-    // Updates content for a selected city's paragraph
-    // Implementation depends on your dbService's methods
+    this.selectedCity$.subscribe(city => {
+      if (!city) {
+        this.errorMessage = 'Nie wybrano miasta.';
+        return;
+      }
+      if (this.userEmail && city.editor === this.userEmail) {
+        this.dbService.updateParagraph(city.id, paragraphId, newContent)
+          .then(() => {
+            console.log('Treść zaktualizowana pomyślnie');
+            this.selectedCityData$ = this.selectedCityData$.pipe(
+              map(paragraphs => {
+                const index = paragraphs.findIndex(p => p.id === paragraphId);
+                if (index !== -1) {
+                  paragraphs[index].body = newContent;
+                }
+                return paragraphs;
+              })
+            );
+          })
+          .catch(error => {
+            console.error('Błąd podczas aktualizacji treści:', error);
+            this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
+          });
+      } else {
+        this.errorMessage = 'Nie masz uprawnień do edycji tej treści.';
+      }
+    });
   }
+  
 
   logout(): void {
     this.afAuth.signOut().then(() => {
