@@ -19,8 +19,9 @@
   <div *ngIf="selectedCity$ | async as selectedCity" class="city-details">
     <h3>Szczegóły miasta: {{ selectedCity.country }}</h3>
     <div *ngFor="let paragraph of selectedCityData$ | async">
-      <p><strong>Nagłówek:</strong> {{ paragraph.header }}</p>
-      <p><strong>Treść:</strong> {{ paragraph.body }}</p>
+      <br>
+      <h4>{{ paragraph.header }}</h4>
+      <p>{{ paragraph.body }}</p>
       <div *ngIf="userEmail === selectedCity.editor"> <!-- Updated to use userEmail -->
         <form [formGroup]="editForm">
           <label for="content">Edytuj treść:</label>

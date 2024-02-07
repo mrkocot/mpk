@@ -82,7 +82,11 @@ export class DbService {
   }
 
   private async create(body: TechParagraphBody): Promise<void> {
-    await this.getBodyCollection(body.city).add(body);
+    let collection = this.db.collection<object>(
+      '/body',
+      x => x.where('city', '==', body.city)
+    );
+    await collection.add(body.toObject());
   }
 
   private async update(newBody: TechParagraphBody): Promise<void> {
@@ -125,4 +129,8 @@ class TechParagraphBody {
   city: string = "";
   headerId: string = "";
   body: string = "";
+
+  toObject(): object {
+    return {city: this.city, headerId: this.headerId, body: this.body};
+  }
 }
