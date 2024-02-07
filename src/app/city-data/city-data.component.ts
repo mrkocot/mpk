@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { City } from '../city';
 import { DbService } from '../db.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth'; // Import AngularFireAuth
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-city-data',
@@ -16,23 +16,18 @@ export class CityDataComponent implements OnInit {
   cities$: Observable<City[]> = of([]);
   selectedCity$: Observable<City | undefined> = of(undefined);
   selectedCityData$: Observable<any[]> = of([]);
-  editForm: FormGroup;
+  editForms: Map<string, FormGroup> = new Map(); // Mapa formularzy
   userName: string | null = null;
   userProfilePic: string | null = null;
   errorMessage: string = '';
   public userEmail: string | null = null;
 
-
   constructor(
     private dbService: DbService,
     private fb: FormBuilder,
-    public afAuth: AngularFireAuth, // Inject AngularFireAuth
+    public afAuth: AngularFireAuth,
     private router: Router
-  ) {
-    this.editForm = this.fb.group({
-      content: ['']
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
     this.loadCities();
@@ -42,12 +37,10 @@ export class CityDataComponent implements OnInit {
   subscribeToUser(): void {
     this.afAuth.authState.subscribe(user => {
       if (user) {
-        // If user is logged in, set userName and userProfilePic
         this.userName = user.displayName;
         this.userProfilePic = user.photoURL;
-        this.userEmail = user.email; // Storing user's email for authorization checks
+        this.userEmail = user.email;
       } else {
-        // If user is not logged in, redirect to login page
         this.userEmail = null;
         this.router.navigate(['/login']);
       }
@@ -55,7 +48,6 @@ export class CityDataComponent implements OnInit {
   }
 
   loadCities(): void {
-    // Loads cities from the database
     this.cities$ = from(this.dbService.getCities()).pipe(
       catchError(error => {
         this.errorMessage = 'Error loading cities.';
@@ -65,7 +57,6 @@ export class CityDataComponent implements OnInit {
   }
 
   selectCity(cityId: string): void {
-    // Selects a city and loads its data
     this.selectedCity$ = this.cities$.pipe(
       map(cities => cities.find(city => city.id === cityId))
     );
@@ -76,42 +67,66 @@ export class CityDataComponent implements OnInit {
         return of([]);
       })
     );
+
+    this.selectedCityData$.subscribe(paragraphs => {
+      paragraphs.forEach(paragraph => {
+        if (!this.editForms.has(paragraph.id)) {
+          this.editForms.set(paragraph.id, this.fb.group({
+            content: ['']
+          }));
+        }
+      });
+    });
+  }
+
+  getForm(paragraphId: string): FormGroup {
+    return this.editForms.get(paragraphId) || this.fb.group({ content: [''] });
   }
 
   updateContent(paragraphId: string, newContent: string): void {
-    this.selectedCity$.subscribe(city => {
-      if (!city) {
-        this.errorMessage = 'Nie wybrano miasta.';
-        return;
-      }
-      if (this.userEmail && city.editor === this.userEmail) {
-        this.dbService.updateParagraph(city.id, paragraphId, newContent)
-          .then(() => {
-            console.log('Treść zaktualizowana pomyślnie');
-            this.selectedCityData$ = this.selectedCityData$.pipe(
-              map(paragraphs => {
-                const index = paragraphs.findIndex(p => p.id === paragraphId);
-                if (index !== -1) {
-                  paragraphs[index].body = newContent;
-                }
-                return paragraphs;
-              })
-            );
-          })
-          .catch(error => {
-            console.error('Błąd podczas aktualizacji treści:', error);
-            this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
-          });
-      } else {
-        this.errorMessage = 'Nie masz uprawnień do edycji tej treści.';
-      }
-    });
+    if (!this.editForms.has(paragraphId)) {
+      console.error('Formularz nie został znaleziony dla id:', paragraphId);
+      return;
+    }
+  
+    const form = this.editForms.get(paragraphId);
+    if (form) {
+      this.selectedCity$.subscribe(city => {
+        if (!city) {
+          this.errorMessage = 'Nie wybrano miasta.';
+          return;
+        }
+        if (this.userEmail && city.editor === this.userEmail) {
+          this.dbService.updateParagraph(city.id, paragraphId, newContent)
+            .then(() => {
+              console.log('Treść zaktualizowana pomyślnie');
+              // Zaktualizuj treść i nagłówek paragrafu
+              this.selectedCityData$ = this.selectedCityData$.pipe(
+                map(paragraphs => {
+                  const index = paragraphs.findIndex(p => p.id === paragraphId);
+                  if (index !== -1) {
+                    paragraphs[index].body = newContent;
+                  }
+                  return paragraphs;
+                })
+              );
+            })
+            .catch(error => {
+              console.error('Błąd podczas aktualizacji treści:', error);
+              this.errorMessage = 'Wystąpił błąd podczas aktualizacji treści.';
+            });
+        } else {
+          this.errorMessage = 'Nie masz uprawnień do edycji tej treści.';
+        }
+      });
+    }
   }
+  
   
 
   logout(): void {
     this.afAuth.signOut().then(() => {
-      this.router.navigate(['/login']); // Redirect to login on logout
+      this.router.navigate(['/login']);
     });
   }
 }

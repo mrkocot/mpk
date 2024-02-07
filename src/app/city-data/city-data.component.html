@@ -21,11 +21,11 @@
     <div *ngFor="let paragraph of selectedCityData$ | async">
       <p><strong>Nagłówek:</strong> {{ paragraph.header }}</p>
       <p><strong>Treść:</strong> {{ paragraph.body }}</p>
-      <div *ngIf="userEmail === selectedCity.editor"> <!-- Updated to use userEmail -->
-        <form [formGroup]="editForm">
+      <div *ngIf="userEmail === selectedCity.editor">
+        <form [formGroup]="getForm(paragraph.id)">
           <label for="content">Edytuj treść:</label>
           <textarea id="content" formControlName="content"></textarea>
-          <button type="button" (click)="updateContent(paragraph.id, editForm.value.content)">Zapisz zmiany</button>
+          <button type="button" (click)="updateContent(paragraph.id, getForm(paragraph.id).value.content)">Zapisz zmiany</button>
         </form>
       </div>
     </div>
