@@ -6,7 +6,7 @@
       <button class="logout-btn" (click)="logout()">Wyloguj</button>
     </div>
   </div>
-  <h2>Lista krajów: </h2>
+  <h2>Lista miast: </h2>
   <br>
   <div class="cities-list">
     <ul>
@@ -17,16 +17,16 @@
   </div>
 
   <div *ngIf="selectedCity$ | async as selectedCity" class="city-details">
-    <h3>Szczegóły miasta: {{ selectedCity.country }}</h3>
+    <h3>Szczegóły miasta: {{ selectedCity.name }}</h3>
     <div *ngFor="let paragraph of selectedCityData$ | async">
       <br>
       <h4>{{ paragraph.header }}</h4>
       <p>{{ paragraph.body }}</p>
-      <div *ngIf="userEmail === selectedCity.editor"> <!-- Updated to use userEmail -->
-        <form [formGroup]="editForm">
+      <div *ngIf="userEmail === selectedCity.editor">
+        <form [formGroup]="getForm(paragraph.id)">
           <label for="content">Edytuj treść:</label>
           <textarea id="content" formControlName="content"></textarea>
-          <button type="button" (click)="updateContent(paragraph.id, editForm.value.content)">Zapisz zmiany</button>
+          <button type="button" (click)="updateContent(paragraph.id, getForm(paragraph.id).value.content)">Zapisz zmiany</button>
         </form>
       </div>
     </div>
